@@ -6,14 +6,16 @@
 	<title>valency fig 2.1</title>
 	<style type="text/css">
 		body {
-			padding: 0.25vw;
+			padding-left: 0.25vw;
+			padding-right: 0.25vw;
 			background-color: #f0f0f0;
 			font-family: Arial, sans-serif;
+			overflow: hidden;
 		}
 		#xp-bar {
 			float: left;
 			height: 5vh;
-			width: 100vw;
+			width: 99.5vw;
 			font-size: 4.5vh;
 			background-color: #006699;
 			position: relative;
@@ -24,7 +26,7 @@
 		#content {
 			float: left;
 			height: 85vh;
-			width: 100vw;
+			width: 99.5vw;
 			background-color: #EEEEEE;
 			display: flex;
 			align-items: center;
@@ -96,81 +98,97 @@
 		var xp = 0;
 		var currentLevel = 1;
 		var xpNeededForNextLevel = 5;
-		var xpGainedPerClick = 1;
+		var xpGainedPerClick = 2.5;
 		var userInput = 0; // Variable to store input number
+		var questionType = 1;
 		var operationIndex = 1;
 		var rangeAddition = 5;
 		var rangeSubtraction = 5;
 		var rangeMultiplication = 3;
-		var rangeDivision = 3;
+		var rangeDivision = -5;
+		var rangeAlgebra = -48;
 		var amountCorrect = 0;
 		var strikeAmount = 5;
+		var answer = 0;
+		var coefficient = 0;
+		var constant = 0;
+
 
 		var number1 = 0;
 		var number2 = 0;
 
 
+
 		function setProgressBarWidth(percentage) {
 			if (percentage < 0) percentage = 0;
-			if (percentage > 1) {
+			if (percentage >= 0.99) {
 				xp -= xpNeededForNextLevel;
 				percentage -= 1;
 				currentLevel += 1;
-				xpGainedPerClick *= 0.8 + 0.05;
+				xpGainedPerClick = 0.15+(0.9 ** (currentLevel-1));
 				rangeAddition *= 2;
-				rangeSubtraction *= 2;
-				rangeMultiplication *= 1.25;
-				rangeDivision *= 1.15;
+				rangeSubtraction *= 1.75;
+				rangeMultiplication += 2;
+				rangeDivision += 2;
+				rangeAlgebra += 4;
+				levelUpMessage();
 				displayLevel();
 			}
 			document.getElementById('progress-bar').style.width = (percentage * 100) + '%';
 		}
 
 		function checkAnswer() {
-		    const inputElement = document.getElementById('user-input');	   
+		    const inputElement = document.getElementById('user-input');	  
+		    if(questionType == 1) {		    	
 		    	if(operationIndex == 1) {
 			        if(number1 + number2 == userInput) {
 			            addXP(xpGainedPerClick);
 			            console.log("Answer checked - correct");
-			            alert("Your answer is correct. Good job.");
 			            amountCorrect += 1;
 			            newQuestion();
 			        } else {
-			            alert("Your answer is wrong. Please check again.");
 			            strikeAmount -= 1;
+			            messUp();
 
 			        }
 			    } else if(operationIndex == 2) {
 			        if(number1 - number2 == userInput) {
 			            addXP(xpGainedPerClick);
-			            alert("Your answer is correct. Good job.");
 			            amountCorrect += 1;
 			            newQuestion();
 			        } else {
-			            alert("Your answer is wrong. Please check again.");
 			            strikeAmount -= 1;
+			            messUp();
 			        }
 			    } else if(operationIndex == 3) {
 			        if(number1 * number2 == userInput) {
 			            addXP(xpGainedPerClick);
-			            alert("Your answer is correct. Good job.");
 			            amountCorrect += 1;
 			            newQuestion();
 			        } else {
-			            alert("Your answer is wrong. Please check again.");
 			            strikeAmount -= 1;
+			            messUp();
 			        }
 			    } else if(operationIndex == 4) {
 			        if(number1 / number2 == userInput) {
 			            addXP(xpGainedPerClick);
-			            alert("Your answer is correct. Good job.");
 			            amountCorrect += 1;
 			            newQuestion();
 			        } else {
-			            alert("Your answer is wrong. Please check again.");
 			            strikeAmount -= 1;
+			            messUp();
 			        }
 			    }
+			} else {
+				if(userInput == answer) {
+					addXP(xpGainedPerClick);
+			        amountCorrect += 1;
+			        newQuestion();
+				}else{
+					strikeAmount -= 1;
+					messUp();
+				}
+			};
 			document.getElementById('amount-correct-display').innerHTML = "Questions answered correctly: " + amountCorrect;
 			document.getElementById('strikes').innerHTML = "Strikes remaining: " + strikeAmount + "/5";
 			if(strikeAmount <= 0) {
@@ -181,12 +199,41 @@
 		    inputElement.value = ''; // Clear the input field after each answer
 		}
 
+		function messUp(argument) {
+			timeNow = (performance.now() / 1000).toFixed(3);
+			document.getElementById('console').innerHTML = document.getElementById('console').innerHTML + "<div style='color: #FF4444'><b> (" + timeNow + "s) Uh oh. You messed up. You have " + strikeAmount + " strikes remaining.</b></div>";
+			const consoleElement = document.getElementById('console');
+			consoleElement.scrollTop = consoleElement.scrollHeight;
+		}
+
+		function noInput(argument) {
+			timeNow = (performance.now() / 1000).toFixed(3);
+			document.getElementById('console').innerHTML = document.getElementById('console').innerHTML + "<div style='color: #FFFF00'> (" + timeNow + "s) Error: No input detected.</div>";
+			const consoleElement = document.getElementById('console');
+			consoleElement.scrollTop = consoleElement.scrollHeight;
+		}
+
+		function levelUpMessage(argument) {
+			timeNow = (performance.now() / 1000).toFixed(3);
+			document.getElementById('console').innerHTML = document.getElementById('console').innerHTML + "<div style='color: #00FF00'> (" + timeNow + "s) Level up! Your new level is " + currentLevel + ".</div>";
+			const consoleElement = document.getElementById('console');
+			consoleElement.scrollTop = consoleElement.scrollHeight;
+		}
+
 		window.addEventListener('DOMContentLoaded', function() {
 			number1 = 1;
 			number2 = 1;
 			operationIndex = 1;
 			document.getElementById('question-display').innerHTML = "Find " + number1 + " + " + number2 + ".";
 			console.log('Window is loaded!');
+
+			// Add event listener for Enter key press
+			const inputElement = document.getElementById('user-input');
+			inputElement.addEventListener('keydown', function(event) {
+				if (event.key === 'Enter') {
+					saveVariable();
+				}
+			});
 		});
 
 		function setStrikes(argument) {
@@ -203,31 +250,71 @@
 		}
 
 		function newQuestion() {
+			questionType = Math.floor(1 + Math.random()*2);
+			if(questionType == 1 || currentLevel < 14.5) {
+				questionType = 1;
+				normalQuestion();
+			}else{
+				algebraQuestion();
+			}
+			
+		}
+
+		function eraseConsole(argument) {
+			timeNow = (performance.now() / 1000).toFixed(3);
+			document.getElementById('console').innerHTML = "<div style='color: #00FFFF'> (" + timeNow + "s) Console cleared!</div>";
+			const consoleElement = document.getElementById('console');
+			consoleElement.scrollTop = consoleElement.scrollHeight;
+		}
+
+		function algebraQuestion() {
+		    answer = Math.floor(5 + Math.random() * rangeAlgebra);
+		    coefficient = Math.floor(2 + Math.random() * rangeAlgebra * 0.25);
+		    constant = coefficient * answer;
+		    document.getElementById('question-display').innerHTML = coefficient + "x - " + constant + " = 0. Find x.";
+		}
+
+
+		function normalQuestion(argument) {
 			operationIndex = Math.floor(1 + Math.random()*4);
 			if(operationIndex == 1) {
-				number1 = Math.floor(Math.random()*rangeAddition);
-				number2 = Math.floor(Math.random()*rangeAddition);
-				document.getElementById('question-display').innerHTML = "Find " + number1 + " + " + number2 + ".";
+				generateAddition();
 			}else if(operationIndex == 2) {
-				number2 = Math.floor(Math.random()*rangeSubtraction);
-				number1 = number2 + Math.floor(Math.random()*rangeSubtraction * 0.5)
-				document.getElementById('question-display').innerHTML = "Find " + number1 + " - " + number2 + ".";
-
+				generateSubtraction();
 			}else if(operationIndex == 3) {
-				number1 = Math.floor(Math.random()*rangeMultiplication);
-				number2 = 5 + Math.floor(Math.random()*rangeMultiplication);
-				document.getElementById('question-display').innerHTML = "Find " + number1 + " x " + number2 + ".";
+				generateMultiplication();
 			}else if(operationIndex == 4) {
-				number2 = Math.floor(Math.random()*rangeDivision);
-				number1 = number2 * (2 + Math.floor(Math.random()*rangeDivision));
-				document.getElementById('question-display').innerHTML = "Find " + number1 + " / " + number2 + ".";
+				generateDivision();
 			}else{
 				alert("There was an error. Please reload the page.")
 			}
 			if(number1 == 0 || number2 == 0 || number1 == 1 && operationIndex == 3 || number2 == 1 && operationIndex == 3 || number1 == 1 && operationIndex == 4 || number2 == 1 && operationIndex == 4 || number2 == number1 && operationIndex == 2 || number1 == 1 && number2 == 1 && operationIndex == 1 || operationIndex > 1.5 && currentLevel < 1.5 || operationIndex > 2.5 && currentLevel < 2.5 || operationIndex > 3.5 && currentLevel < 3.5 ) {
 				newQuestion();
 			}
+		}
 
+		function generateAddition(argument) {
+			number1 = Math.floor(Math.random()*rangeAddition);
+			number2 = Math.floor(Math.random()*rangeAddition);
+			document.getElementById('question-display').innerHTML = "Find " + number1 + " + " + number2 + ".";
+		}
+
+		function generateSubtraction(argument) {
+			number2 = Math.floor(Math.random()*rangeSubtraction);
+			number1 = number2 + Math.floor(Math.random()*rangeSubtraction * 0.5)
+			document.getElementById('question-display').innerHTML = "Find " + number1 + " - " + number2 + ".";
+		}
+
+		function generateMultiplication(argument) {
+			number1 = Math.floor(Math.random()*rangeMultiplication);
+			number2 = 5 + Math.floor(Math.random()*rangeMultiplication);
+			document.getElementById('question-display').innerHTML = "Find " + number1 + " x " + number2 + ".";
+		}
+
+		function generateDivision(argument) {
+			number2 = 3 + Math.floor(Math.random()*rangeDivision);
+			number1 = number2 * (1 + Math.floor(Math.random()*rangeDivision*3));
+			document.getElementById('question-display').innerHTML = "Find " + number1 + " / " + number2 + ".";
 		}
 
 		function addXP(amount) {
@@ -262,11 +349,12 @@
 		function saveVariable() {
 			const inputElement = document.getElementById('user-input');
 			userInput = parseInt(inputElement.value);
-			console.log("User input saved:", userInput);
-			checkAnswer();
-
-			// Optionally, you can add the XP based on the input
-			// addXP(userInput);
+			if(!userInput) {
+				noInput();
+			} else {
+				console.log("User input saved:", userInput);
+				checkAnswer();
+			}	
 		}
 
 		function setParameters() {
@@ -300,9 +388,18 @@
 			<button class="button" onClick="saveVariable()">Submit</button>
 		</div>	
 		<div id="amount-correct-display">Questions answered correctly: none so far.</div>	
-		<div id="strikes">Strikes remaining: 5/5</div>	
+		<div id="strikes">Strikes remaining: 5/5</div>
+		<div id="console-box" style="width: 97vw; height: 20vh; background-color: #000000; color: #FFFFFF; border-radius: 1vh;">
+			<div style="background-color: #555555; height: 20%; text-align: center;">
+				Console
+				<button style="background-color: #888888; border: 0px; border-radius: 1vh;" onClick="eraseConsole()">clear</button>
+			</div>
+			<div id="console" style="padding-left: 1vw; color: #FFFFFF; height: 80%; overflow-y: auto;">
+				<div style="color: #00FFFF">(0.000s) Window loaded successfully!</div>
+			</div>
+		</div>	
 		<div>
-			<br><br><br><br><br>Debug: <br>
+	<br>Debug: <br>
 		<button onClick="addXP(xpNeededForNextLevel-xp)">+1 level</button>
 		<button onClick="skipQuestion()">skip question</button>
 		<button onClick="setStrikes(5)">restore strikes</button>
