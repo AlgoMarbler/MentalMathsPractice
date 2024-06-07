@@ -106,7 +106,7 @@
 		var rangeSubtraction = 5;
 		var rangeMultiplication = 3;
 		var rangeDivision = -5;
-		var rangeAlgebra = -48;
+		var rangeAlgebra = -28;
 		var amountCorrect = 0;
 		var strikeAmount = 5;
 		var answer = 0;
@@ -251,7 +251,7 @@
 
 		function newQuestion() {
 			questionType = Math.floor(1 + Math.random()*2);
-			if(questionType == 1 || currentLevel < 14.5) {
+			if(questionType == 1 || currentLevel < 7.5) {
 				questionType = 1;
 				normalQuestion();
 			}else{
