@@ -117,6 +117,53 @@
 		var number1 = 0;
 		var number2 = 0;
 
+		function saveGame() {
+		    const gameState = {
+		        xp: xp,
+		        currentLevel: currentLevel,
+		        xpNeededForNextLevel: xpNeededForNextLevel,
+		        xpGainedPerClick: xpGainedPerClick,
+		        amountCorrect: amountCorrect,
+		        strikeAmount: strikeAmount,
+		        rangeAddition: rangeAddition,
+		        rangeSubtraction: rangeSubtraction,
+		        rangeMultiplication: rangeMultiplication,
+		        rangeDivision: rangeDivision,
+		        rangeAlgebra: rangeAlgebra
+		    };
+		    localStorage.setItem('gameState', JSON.stringify(gameState));
+		    alert("Game saved successfully!");
+		}
+
+		function loadGame() {
+		    const savedGame = localStorage.getItem('gameState');
+		    if (savedGame) {
+		        const gameState = JSON.parse(savedGame);
+		        xp = gameState.xp;
+		        currentLevel = gameState.currentLevel;
+		        xpNeededForNextLevel = gameState.xpNeededForNextLevel;
+		        xpGainedPerClick = gameState.xpGainedPerClick;
+		        amountCorrect = gameState.amountCorrect;
+		        strikeAmount = gameState.strikeAmount;
+		        rangeAddition = gameState.rangeAddition;
+		        rangeSubtraction = gameState.rangeSubtraction;
+		        rangeMultiplication = gameState.rangeMultiplication;
+		        rangeDivision = gameState.rangeDivision;
+		        rangeAlgebra = gameState.rangeAlgebra;
+		        
+		        // Update the UI
+		        setProgressBarWidth(xp / xpNeededForNextLevel);
+		        displayLevel();
+		        document.getElementById('amount-correct-display').innerHTML = "Questions answered correctly: " + amountCorrect;
+		        document.getElementById('strikes').innerHTML = "Strikes remaining: " + strikeAmount + "/5";
+		        newQuestion();
+		        alert("Game loaded successfully!");
+		    } else {
+		        alert("No saved game found.");
+		    }
+		}
+
+
 
 
 		function setProgressBarWidth(percentage) {
@@ -138,66 +185,66 @@
 		}
 
 		function checkAnswer() {
-		    const inputElement = document.getElementById('user-input');	  
-		    if(questionType == 1) {		    	
-		    	if(operationIndex == 1) {
-			        if(number1 + number2 == userInput) {
-			            addXP(xpGainedPerClick);
-			            console.log("Answer checked - correct");
-			            amountCorrect += 1;
-			            newQuestion();
-			        } else {
-			            strikeAmount -= 1;
-			            messUp();
-
-			        }
-			    } else if(operationIndex == 2) {
-			        if(number1 - number2 == userInput) {
-			            addXP(xpGainedPerClick);
-			            amountCorrect += 1;
-			            newQuestion();
-			        } else {
-			            strikeAmount -= 1;
-			            messUp();
-			        }
-			    } else if(operationIndex == 3) {
-			        if(number1 * number2 == userInput) {
-			            addXP(xpGainedPerClick);
-			            amountCorrect += 1;
-			            newQuestion();
-			        } else {
-			            strikeAmount -= 1;
-			            messUp();
-			        }
-			    } else if(operationIndex == 4) {
-			        if(number1 / number2 == userInput) {
-			            addXP(xpGainedPerClick);
-			            amountCorrect += 1;
-			            newQuestion();
-			        } else {
-			            strikeAmount -= 1;
-			            messUp();
-			        }
-			    }
-			} else {
-				if(userInput == answer) {
-					addXP(xpGainedPerClick);
-			        amountCorrect += 1;
-			        newQuestion();
-				}else{
-					strikeAmount -= 1;
-					messUp();
-				}
-			};
-			document.getElementById('amount-correct-display').innerHTML = "Questions answered correctly: " + amountCorrect;
-			document.getElementById('strikes').innerHTML = "Strikes remaining: " + strikeAmount + "/5";
-			if(strikeAmount <= 0) {
-				alert("You ran out of strikes. Your score: " + amountCorrect);
-				location.reload();
-
-			}
+		    const inputElement = document.getElementById('user-input');
+		    if (questionType == 1) {
+		        if (operationIndex == 1) {
+		            if (number1 + number2 == userInput) {
+		                addXP(xpGainedPerClick);
+		                console.log("Answer checked - correct");
+		                amountCorrect += 1;
+		                newQuestion();
+		            } else {
+		                strikeAmount -= 1;
+		                messUp();
+		            }
+		        } else if (operationIndex == 2) {
+		            if (number1 - number2 == userInput) {
+		                addXP(xpGainedPerClick);
+		                amountCorrect += 1;
+		                newQuestion();
+		            } else {
+		                strikeAmount -= 1;
+		                messUp();
+		            }
+		        } else if (operationIndex == 3) {
+		            if (number1 * number2 == userInput) {
+		                addXP(xpGainedPerClick);
+		                amountCorrect += 1;
+		                newQuestion();
+		            } else {
+		                strikeAmount -= 1;
+		                messUp();
+		            }
+		        } else if (operationIndex == 4) {
+		            if (number1 / number2 == userInput) {
+		                addXP(xpGainedPerClick);
+		                amountCorrect += 1;
+		                newQuestion();
+		            } else {
+		                strikeAmount -= 1;
+		                messUp();
+		            }
+		        }
+		    } else {
+		        if (userInput == answer) {
+		            addXP(xpGainedPerClick);
+		            amountCorrect += 1;
+		            newQuestion();
+		        } else {
+		            strikeAmount -= 1;
+		            messUp();
+		        }
+		    }
+		    document.getElementById('amount-correct-display').innerHTML = "Questions answered correctly: " + amountCorrect;
+		    document.getElementById('strikes').innerHTML = "Strikes remaining: " + strikeAmount + "/5";
+		    if (strikeAmount <= 0) {
+		        alert("You ran out of strikes. Your score: " + amountCorrect);
+		        localStorage.clear();  // Clear the memory to prevent users from save scumming
+		        location.reload();
+		    }
 		    inputElement.value = ''; // Clear the input field after each answer
 		}
+
 
 		function messUp(argument) {
 			timeNow = (performance.now() / 1000).toFixed(3);
@@ -400,6 +447,8 @@
 		</div>	
 		<div>
 	<br>Debug: <br>
+		<button onClick="saveGame()">Save Game</button>
+		<button onClick="loadGame()">Load Game</button>
 		<button onClick="addXP(xpNeededForNextLevel-xp)">+1 level</button>
 		<button onClick="skipQuestion()">skip question</button>
 		<button onClick="setStrikes(5)">restore strikes</button>
